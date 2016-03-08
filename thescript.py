@@ -110,14 +110,6 @@ def main(month, year):
 
 if __name__ == '__main__':
     now = datetime.datetime.now()
-    """if len(sys.argv) > 1:
-        month = int(sys.argv[1])
-    else:
-        month = now.month
-    if len(sys.argv) > 2:
-        year = int(sys.argv[2])
-    else:
-        year = now.year"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-m', '--month', type=int, dest='month', default=now.month,
