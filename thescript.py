@@ -1,33 +1,17 @@
 from __future__ import print_function
 import httplib2
-import os
+import os, sys
 
 import argparse
 from apiclient import discovery
 import oauth2client
-from oauth2client import client
-from oauth2client import tools
 
 import datetime, calendar
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
-
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly', 'https://spreadsheets.google.com/feeds']
-CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'myclient1'
 CALENDAR_ID = 'ck12.org_5oalfcv57o5vq0f9dhfsgmr8q0@group.calendar.google.com'
-SHEET_NAME = 'Attendance'
 
 def get_credentials():
     """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
     Returns:
         Credentials, the obtained credential.
     """
@@ -40,15 +24,6 @@ def get_credentials():
 
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        flags = None
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
     return credentials
 
 def main(month, year):
@@ -58,6 +33,9 @@ def main(month, year):
     print(last_day_of_month)
 
     credentials = get_credentials()
+    if not credentials or credentials.invalid:
+        print('Please run getCredentials.py to authorise yourself')
+        return
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
@@ -131,8 +109,16 @@ def main(month, year):
         column += 1
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
     now = datetime.datetime.now()
+    """if len(sys.argv) > 1:
+        month = int(sys.argv[1])
+    else:
+        month = now.month
+    if len(sys.argv) > 2:
+        year = int(sys.argv[2])
+    else:
+        year = now.year"""
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         '-m', '--month', type=int, dest='month', default=now.month,
         help='The month for which you want PTO info of ck12-in employees'
