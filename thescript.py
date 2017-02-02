@@ -69,7 +69,10 @@ def main(month, year):
 
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'], event['creator']['email'])
+        try:
+            print(start, event['summary'], event['creator']['email'])
+        except:
+            print(start, event['creator']['email'])
     
     #Start writing to google spreadsheet
     import gspread
@@ -104,7 +107,9 @@ def main(month, year):
             else:
                 day_max = start_end_tuple[1].day -1
             while day <= day_max :
-                worksheet.update_cell(day+1, column, 'PTO')
+                weekday = calendar.weekday(year, month, day)
+                if weekday != 5 and weekday != 6:
+                    worksheet.update_cell(day+1, column, 'PTO')
                 day += 1
         column += 1
 
